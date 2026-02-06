@@ -21,25 +21,20 @@ function CaregiverDashboard() {
           return;
         }
         
-        // Get user profile from database
+        // Get user profile from CAREGIVERS table (FIXED!)
         const { data: profile, error: profileError } = await supabase
-          .from('user_profiles')
+          .from('caregivers')
           .select('*')
           .eq('id', session.user.id)
           .single();
         
         if (profileError) throw profileError;
         
-        // Check if user is actually a caregiver (not family)
-        if (profile.user_type !== 'caregiver') {
-          navigate('/login');
-          return;
-        }
-        
         // Set user data
         setUser({
           ...session.user,
-          ...profile
+          ...profile,
+          user_type: 'caregiver'
         });
         
       } catch (error) {

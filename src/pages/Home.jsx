@@ -9,7 +9,7 @@ function Home() {
         <div className="bg-[#E8F1F5] flex items-center px-8 lg:px-20 py-16">
           <div className="max-w-xl">
             <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Your Trusted Partner in In-Home Care
+              Connecting families with care they can trust.
             </h1>
             
             <p className="text-gray-700 mb-8 text-lg leading-relaxed">

@@ -45,7 +45,12 @@ function App() {
             <Footer />
           </div>
         } />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={
+          <div className="min-h-screen bg-gray-50">
+            <Navbar />
+            <Login />
+          </div>
+        } />
         
         {/* Dashboard routes (no Navbar/Footer) */}
         <Route path="/dashboard/family" element={<FamilyDashboard />} />

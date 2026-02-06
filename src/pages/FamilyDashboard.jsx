@@ -21,25 +21,20 @@ function FamilyDashboard() {
           return;
         }
         
-        // Get user profile from database
+        // Get user profile from FAMILIES table (FIXED!)
         const { data: profile, error: profileError } = await supabase
-          .from('user_profiles')
+          .from('families')
           .select('*')
           .eq('id', session.user.id)
           .single();
         
         if (profileError) throw profileError;
         
-        // Check if user is actually a family (not caregiver)
-        if (profile.user_type !== 'family') {
-          navigate('/login');
-          return;
-        }
-        
         // Set user data
         setUser({
           ...session.user,
-          ...profile
+          ...profile,
+          user_type: 'family'
         });
         
       } catch (error) {

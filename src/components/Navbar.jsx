@@ -11,7 +11,7 @@ function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo - clicking it takes you home */}
           <Link to="/" className="text-2xl font-bold text-gray-900 hover:text-[#5B7C99] transition-colors">
-            UnifiedCare
+            UnifiedCare.
           </Link>
           
           {/* Navigation Links - now using Link instead of <a> */}
