@@ -86,7 +86,8 @@ function Login() {
       
       // If profile doesn't exist, create it from metadata
       if (profileError && profileError.code === 'PGRST116') {
-        console.log(`Profile not found in ${tableName}, creating from metadata...`);
+        await supabase.auth.signOut();
+        setLoginError('This account does not exist. Please sign up.');
         
         // Build profile data based on user type
         let profileData = {
