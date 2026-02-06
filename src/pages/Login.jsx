@@ -56,14 +56,13 @@ function Login() {
     setLoginError('');
     
     try {
-      // Supabase Auth login (passwords are securely hashed!)
+      // Supabase Auth login
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password
       });
       
       if (authError) {
-        // Check if email is not confirmed
         if (authError.message?.includes('Email not confirmed')) {
           setLoginError('Please verify your email before logging in. Check your inbox for the confirmation link.');
           setIsSubmitting(false);
@@ -72,29 +71,33 @@ function Login() {
         throw authError;
       }
       
-      // Try to get user profile
+      const metadata = authData.user.user_metadata;
+      const userType = metadata.user_type;
+      
+      // Determine which table to query based on user_type
+      const tableName = userType === 'family' ? 'families' : 'caregivers';
+      
+      // Try to get profile from the correct table
       let { data: profile, error: profileError } = await supabase
-        .from('user_profiles')
+        .from(tableName)
         .select('*')
         .eq('id', authData.user.id)
         .single();
       
-      // If profile doesn't exist yet, create it from user metadata
+      // If profile doesn't exist, create it from metadata
       if (profileError && profileError.code === 'PGRST116') {
-        console.log('Profile not found, creating from metadata...');
-        const metadata = authData.user.user_metadata;
+        console.log(`Profile not found in ${tableName}, creating from metadata...`);
         
-        // Build profile data from metadata
-        const profileData = {
+        // Build profile data based on user type
+        let profileData = {
           id: authData.user.id,
           first_name: metadata.first_name || '',
           last_name: metadata.last_name || '',
-          phone: metadata.phone || '',
-          user_type: metadata.user_type || 'family'
+          email: metadata.email || authData.user.email,
+          phone: metadata.phone || ''
         };
 
-        // Add type-specific fields
-        if (metadata.user_type === 'family') {
+        if (userType === 'family') {
           profileData.address = metadata.address || '';
         } else {
           profileData.experience = metadata.experience || '';
@@ -102,9 +105,9 @@ function Login() {
           profileData.hourly_rate = metadata.hourly_rate || 0;
         }
 
-        // Create the profile
+        // Insert into the correct table
         const { data: newProfile, error: createError } = await supabase
-          .from('user_profiles')
+          .from(tableName)
           .insert([profileData])
           .select()
           .single();
@@ -125,14 +128,17 @@ function Login() {
         throw new Error('Could not load or create user profile');
       }
       
-      // Store user info in localStorage
+      // Add user_type to profile for easy access
+      profile.user_type = userType;
+      
+      // Store in localStorage
       localStorage.setItem('currentUser', JSON.stringify({
         ...authData.user,
         ...profile
       }));
       
-      // Redirect to appropriate dashboard based on user type
-      if (profile.user_type === 'family') {
+      // Redirect to correct dashboard
+      if (userType === 'family') {
         navigate('/dashboard/family');
       } else {
         navigate('/dashboard/caregiver');
@@ -169,8 +175,7 @@ function Login() {
                   <p className="font-semibold">{loginError}</p>
                   {loginError.includes('verify your email') && (
                     <p className="text-sm mt-1">
-                      Didn't receive the email? Check your spam folder or{' '}
-                      <button className="underline font-semibold">resend confirmation</button>
+                      Didn't receive the email? Check your spam folder.
                     </p>
                   )}
                 </div>

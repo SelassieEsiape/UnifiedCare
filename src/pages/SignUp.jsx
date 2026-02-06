@@ -85,15 +85,16 @@ function SignUp() {
     setIsSubmitting(true);
     
     try {
-      // Prepare metadata to store temporarily (will be used to create profile after email confirmation)
+      // Prepare metadata (stores temporarily until email confirmation)
       const metadata = {
         first_name: formData.firstName,
         last_name: formData.lastName,
+        email: formData.email,
         phone: formData.phone,
         user_type: userType
       };
 
-      // Add type-specific fields to metadata
+      // Add type-specific fields
       if (userType === 'family') {
         metadata.address = formData.address;
       } else {
@@ -102,12 +103,12 @@ function SignUp() {
         metadata.hourly_rate = parseFloat(formData.hourlyRate);
       }
 
-      // Create auth user with metadata (Supabase automatically hashes password!)
+      // Create auth user (Supabase hashes password automatically!)
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
-          data: metadata  // Store profile data in user metadata temporarily
+          data: metadata
         }
       });
       
@@ -120,11 +121,19 @@ function SignUp() {
     } catch (error) {
       console.error('Signup error:', error);
       
-      // Handle specific errors
-      if (error.message?.includes('already registered')) {
-        setErrors({ email: 'This email is already registered' });
+      // Better error handling
+      if (error.message?.includes('already registered') || error.message?.includes('User already registered')) {
+        setErrors({ 
+          email: 'This email is already registered. Try logging in instead or use a different email.' 
+        });
+      } else if (error.message?.includes('rate limit')) {
+        setErrors({ 
+          submit: 'Too many signup attempts. Please wait a few minutes and try again.' 
+        });
       } else {
-        setErrors({ submit: error.message || 'Failed to create account. Please try again.' });
+        setErrors({ 
+          submit: error.message || 'Failed to create account. Please try again.' 
+        });
       }
     } finally {
       setIsSubmitting(false);
@@ -263,7 +272,7 @@ function SignUp() {
 
           {errors.submit && (
             <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {errors.submit}
+              <p className="font-semibold">{errors.submit}</p>
             </div>
           )}
 
