@@ -52,11 +52,9 @@ function Navbar() {
               className="flex items-center flex-shrink-0" 
               onClick={() => setIsOpen(false)}
             >
-              <img 
-                src="/logo.png" 
-                alt="UnifiedCare" 
-                className="h-7 sm:h-8 md:h-10 w-auto"
-              />
+              <span className="text-xl sm:text-2xl font-bold text-gray-900">
+                UnifiedCare.
+              </span>
             </Link>
 
             {/* Desktop Navigation */}
