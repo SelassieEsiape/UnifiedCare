@@ -4,13 +4,14 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <div className="bg-white">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-b from-gray-50 to-white">
+      {/* Hero Section - RESPONSIVE LAYOUT */}
+      <div className="relative bg-gradient-to-b from-gray-50 to-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="pt-16 pb-20 sm:pt-24 sm:pb-32 text-center">
-            
+          
+          {/* MOBILE & TABLET: Stacked Layout (Text → Buttons → Image) */}
+          <div className="lg:hidden pt-16 pb-20 text-center">
             {/* Heading */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
               Connecting families with<br />
               care they can trust.
             </h1>
@@ -37,14 +38,55 @@ function Home() {
               </Link>
             </div>
 
-            {/* Hero Image - VISIBLE ON MOBILE */}
-            <div className="relative w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-2xl">
+            {/* Hero Image - Mobile/Tablet */}
+            <div className="relative w-full h-64 sm:h-80 rounded-2xl overflow-hidden shadow-2xl">
               <img
                 src="https://images.unsplash.com/photo-1559234938-b60fff04894d?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8bnVyc2luZyUyMGhvbWV8ZW58MHx8MHx8fDA%3D"
-                alt="Caregiver with patient"
+                alt="Professional caregiver providing care"
                 className="w-full h-full object-cover"
               />
             </div>
+          </div>
+
+          {/* DESKTOP: Side-by-Side Layout (Text on Left, Image on Right) */}
+          <div className="hidden lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center py-20">
+            
+            {/* Left Column: Text & Buttons */}
+            <div className="text-left">
+              <h1 className="text-5xl xl:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                Connecting families with care they can trust.
+              </h1>
+              
+              <p className="text-xl text-gray-600 mb-10 leading-relaxed">
+                Connect with verified caregivers. Manage bookings seamlessly. 
+                Ensure quality care for your loved ones—all in one platform.
+              </p>
+              
+              <div className="flex gap-4">
+                <Link
+                  to="/signup"
+                  className="bg-[#5B7C99] text-white px-8 py-4 rounded-lg hover:bg-[#4a6480] transition-colors duration-200 font-semibold text-lg"
+                >
+                  Find Care
+                </Link>
+                <Link
+                  to="/signup"
+                  className="border-2 border-[#5B7C99] text-[#5B7C99] px-8 py-4 rounded-lg hover:bg-[#5B7C99] hover:text-white transition-colors duration-200 font-semibold text-lg"
+                >
+                  Become a Caregiver
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Column: Image */}
+            <div className="relative h-[500px] xl:h-[600px] rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1559234938-b60fff04894d?w=1920&auto=format&fit=crop&q=80"
+                alt="Professional caregiver providing care"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
           </div>
         </div>
       </div>
