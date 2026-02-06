@@ -40,7 +40,7 @@ function Home() {
             {/* Hero Image - VISIBLE ON MOBILE */}
             <div className="relative w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-2xl">
               <img
-                src="/hero-image.jpg"
+                src="https://images.unsplash.com/photo-1559234938-b60fff04894d?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8bnVyc2luZyUyMGhvbWV8ZW58MHx8MHx8fDA%3D"
                 alt="Caregiver with patient"
                 className="w-full h-full object-cover"
               />
