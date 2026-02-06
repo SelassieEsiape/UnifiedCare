@@ -18,7 +18,6 @@ function Login() {
       ...prev,
       [name]: value
     }));
-
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -30,106 +29,94 @@ function Login() {
 
   const validateForm = () => {
     const newErrors = {};
-
+    
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-
+    
     if (!formData.password) {
       newErrors.password = 'Password is required';
     }
-
+    
     return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
+    
     setIsSubmitting(true);
     setLoginError('');
-
+    
     try {
-      // 1) Supabase Auth login
+      // Supabase Auth login
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password
       });
-
+      
       if (authError) {
         if (authError.message?.includes('Email not confirmed')) {
           setLoginError('Please verify your email before logging in. Check your inbox for the confirmation link.');
+          setIsSubmitting(false);
           return;
         }
         throw authError;
       }
-
-      const user = authData?.user;
-      if (!user) {
-        throw new Error('Login succeeded but no user returned.');
-      }
-
-      const metadata = user.user_metadata || {};
-      const userType = metadata?.user_type;
-
-      // 2) Hard stop if user_type missing (older accounts / incomplete signup)
-      if (!userType) {
-        await supabase.auth.signOut();
-        setLoginError('Account setup is incomplete. Please sign up again.');
-        return;
-      }
-
-      // 3) Determine which table to query based on user_type
+      
+      const metadata = authData.user.user_metadata;
+      const userType = metadata.user_type;
+      
+      // Determine which table to query based on user_type
       const tableName = userType === 'family' ? 'families' : 'caregivers';
-
-      // 4) Fetch profile (NO auto-create on login)
-      const { data: profile, error: profileError } = await supabase
+      
+      // Try to get profile from the correct table
+      let { data: profile, error: profileError } = await supabase
         .from(tableName)
         .select('*')
-        .eq('id', user.id)
+        .eq('id', authData.user.id)
         .single();
-
-      // If profile doesn't exist, treat as deleted/disabled/incomplete
+      
+      // If profile doesn't exist, reject login (account deleted or incomplete)
       if (profileError && profileError.code === 'PGRST116') {
         await supabase.auth.signOut();
-        setLoginError('This account has been deleted or is incomplete. Please sign up.');
+        setLoginError('This account has been deleted or is incomplete. Please sign up again.');
+        setIsSubmitting(false);
         return;
       }
-
+      
       if (profileError) {
         console.error('Error fetching profile:', profileError);
         throw profileError;
       }
-
+      
       if (!profile) {
-        await supabase.auth.signOut();
-        setLoginError('Could not load your account. Please sign up again.');
-        return;
+        throw new Error('Could not load or create user profile');
       }
-
-      // 5) Store in localStorage (include user_type)
-      const userForStorage = {
-        ...user,
-        ...profile,
-        user_type: userType
-      };
-
-      localStorage.setItem('currentUser', JSON.stringify(userForStorage));
-
-      // 6) Redirect to correct dashboard
+      
+      // Add user_type to profile for easy access
+      profile.user_type = userType;
+      
+      // Store in localStorage
+      localStorage.setItem('currentUser', JSON.stringify({
+        ...authData.user,
+        ...profile
+      }));
+      
+      // Redirect to correct dashboard
       if (userType === 'family') {
         navigate('/dashboard/family');
       } else {
         navigate('/dashboard/caregiver');
       }
-
+      
     } catch (error) {
       console.error('Login error:', error);
       setLoginError('Invalid email or password. Please try again.');
@@ -150,16 +137,12 @@ function Login() {
               Sign in to your UnifiedCare account
             </p>
           </div>
-
+          
           {loginError && (
             <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
               <div className="flex items-start">
                 <svg className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
                 <div>
                   <p className="font-semibold">{loginError}</p>
@@ -172,7 +155,7 @@ function Login() {
               </div>
             </div>
           )}
-
+          
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
