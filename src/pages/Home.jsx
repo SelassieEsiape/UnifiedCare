@@ -4,42 +4,48 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <div className="bg-white">
-      {/* ===== HERO SECTION ===== */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
-        <div className="bg-[#E8F1F5] flex items-center px-8 lg:px-20 py-16">
-          <div className="max-w-xl">
-            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Connecting families with care they can trust.
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="pt-16 pb-20 sm:pt-24 sm:pb-32 text-center">
+            
+            {/* Heading */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              Connecting families with<br />
+              care they can trust.
             </h1>
             
-            <p className="text-gray-700 mb-8 text-lg leading-relaxed">
+            {/* Subheading */}
+            <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
               Connect with verified caregivers. Manage bookings seamlessly. 
               Ensure quality care for your loved ones—all in one platform.
             </p>
             
-            <div className="flex gap-4">
-              <Link to="/signup">
-                <button className="bg-[#5B7C99] text-white px-8 py-3 rounded-lg hover:bg-[#4a6480] transition-colors duration-200 text-base font-semibold shadow-lg">
-                  Find Care
-                </button>
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+              <Link
+                to="/signup"
+                className="bg-[#5B7C99] text-white px-8 py-4 rounded-lg hover:bg-[#4a6480] transition-colors duration-200 font-semibold text-lg w-full sm:w-auto"
+              >
+                Find Care
               </Link>
-              <Link to="/signup">
-                <button className="bg-white text-[#5B7C99] px-8 py-3 rounded-lg border-2 border-[#5B7C99] hover:bg-[#5B7C99] hover:text-white transition-colors duration-200 text-base font-semibold">
-                  Become a Caregiver
-                </button>
+              <Link
+                to="/signup"
+                className="border-2 border-[#5B7C99] text-[#5B7C99] px-8 py-4 rounded-lg hover:bg-[#5B7C99] hover:text-white transition-colors duration-200 font-semibold text-lg w-full sm:w-auto"
+              >
+                Become a Caregiver
               </Link>
             </div>
+
+            {/* Hero Image - VISIBLE ON MOBILE */}
+            <div className="relative w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src="/hero-image.jpg"
+                alt="Caregiver with patient"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
-        </div>
-        
-        <div className="relative overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1559234938-b60fff04894d?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Two people walking on a garden path"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: 'center 25%' }}
-            loading="eager"
-          />
         </div>
       </div>
 
